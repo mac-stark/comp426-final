@@ -34,7 +34,7 @@ get_latest_prices = async function() {
     console.log('Getting latest record in crypto_prices');
     con.query('USE crypto_prices;');
     return new Promise(function(resolve, reject) {
-        let sql_query = "SELECT * FROM coin_prices_data WHERE id = (SELECT max(id) FROM coin_prices_data);";
+        let sql_query = "SELECT * FROM coin_prices_data ORDER BY id DESC LIMIT 15;";
         con.query(sql_query, function(err, rows, fields) {
             if (err) return reject(err);
             resolve(rows);
