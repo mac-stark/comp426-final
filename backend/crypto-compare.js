@@ -6,7 +6,6 @@ const half_url = 'https://min-api.cryptocompare.com/data/price?fsym=BTC&tsyms=US
 const full_url = half_url + '&api_key=' + api_key;
 
 get_crypto_prices =  async function () {
-    let data = '';
     const result = await axios({
         method: 'get',
         url :'https://min-api.cryptocompare.com/data/price?fsym=BTC&tsyms=USD,ETH,LTC&api_key=017e724e6a6b3da9861ae43054999fbb4675b766f25f7ece6608c847d7464323',

@@ -8,14 +8,18 @@ let con = my_sql.createConnection({
     insecureAuth:true
 });
 
-con.connect(function(err) {if (err){ throw err}; console.log('Connected to mysql database');});
+con.connect(function(err) {
+    if (err){ throw err}; 
+    console.log('Connected to mysql database');
+    setInterval(minute_update, 60*1000);
+});
 
 minute_update = async function() {
     con.query('USE crypto_prices;');
     crypto_compare.get_crypto_prices().then((result) => {
         let date_obj = result.date.split(' ');
         let day = date_obj[1] + '-' + date_obj[2] + '-' + date_obj[3];
-        let time = date_obj[4];
+        let time = date_obj[4].split(':')[0] + ':' + date_obj[4].split(':')[1];
         let final_date_time = day + '#' + time;
         let values = '(' + "'" + final_date_time + "'" + ',' + result.price_data.BTC_USD + ',' + result.price_data.ETH_USD + ',' + result.price_data.LTC_USD + ')';
         let insert = "INSERT INTO coin_prices_data (date_time, btc_usd, eth_usd, ltc_usd) VALUES " + values;
@@ -37,7 +41,6 @@ get_latest_prices = async function() {
         });
     });
 }
-
 
 get_portfolio_by_id = async function(portfolio_id) {
     console.log('Getting latest portfolio record');
@@ -67,7 +70,6 @@ get_portfolio_value = async function(portfolio_id) {
         }).catch((error) => console.log(error));
     }).catch((error) => console.log(error));
 }
-
 
 make_transaction = async function(portfolio_id, t_o) {
     console.log('Starting a new transaction');
