@@ -10,7 +10,7 @@ let con = my_sql.createConnection({
 
 con.connect(function(err) {if (err){ throw err}; console.log('Connected to mysql database');});
 
-exports.minute_update = function() {
+minute_update = async function() {
     con.query('USE crypto_prices;');
     crypto_compare.get_crypto_prices().then((result) => {
         let date_obj = result.date.split(' ');
@@ -115,3 +115,4 @@ module.exports.make_transaction = make_transaction;
 module.exports.get_portfolio_by_id = get_portfolio_by_id;
 module.exports.get_latest_prices = get_latest_prices;
 module.exports.get_portfolio_value = get_portfolio_value;
+module.exports.minute_update = minute_update;
