@@ -9,7 +9,7 @@ class Display extends React.Component {
         }
     }
     componentDidMount() {
-        this.state = {price_val: this.props.val};
+        this.setState({price_val: this.props.val});
     }
     render(){
         return (<div className='container'>

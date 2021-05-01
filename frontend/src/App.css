@@ -1,3 +1,34 @@
+.top {
+  position: relative;
+  top:0;
+  left:0;
+  right:0;
+  height:50%;
+}
+.bottom {
+  position:relative;
+  left:0;
+  right:0;
+  height:50%;
+  bottom:0;
+}
+.portfolio {
+  position:absolute;
+  display: inline-block;
+  left:0;
+  height:50%;
+  width:50%;
+  top:-75px;
+}
+
+.transaction {
+  position:relative;
+  left:50%;
+  height:50%;
+  width:50%;
+  bottom: 25%;
+  top:-75px;
+}
 .App {
   text-align: center;
 }
@@ -24,3 +55,20 @@
 .element {
   font-size: x-small;
 }
+.tab-list {  border-bottom: 1px solid #ccc;
+  padding-left: 0;
+}
+
+.tab-list-item {
+  display: inline-block;
+  list-style: none;
+  margin-bottom: -1px;
+  padding: 0.5rem 0.75rem;
+}
+
+.tab-list-active {
+  background-color: white;
+  border: solid #ccc;
+  border-width: 1px 1px 0 1px;
+}
+
