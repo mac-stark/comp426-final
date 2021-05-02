@@ -23,7 +23,8 @@ class Transaction extends React.Component {
             url: go_url,
         }).then((response) => {
             console.log(response);
-            this.state.callback(response.data[0])
+            this.state.callback(response.data[0]);
+            console.log('calling portfolio callback');
         }).catch((error) => {
             console.log(error);
             console.log('Transaction Error: Illegal Transaction');

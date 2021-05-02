@@ -16,7 +16,7 @@ con.connect(function (err) {
 });
 
 minute_update = async function () {
-    con.query('USE crypto_app;');
+    con.query('USE crypto_schema;');
     crypto_compare.get_crypto_prices().then((result) => {
         let date_obj = result.date.split(' ');
         let month = date_obj[2] == 'Apr' ? '04' : '05';
@@ -30,25 +30,30 @@ minute_update = async function () {
             if (err) throw err;
             console.log("Latest price record inserted");
         });
-        console.log(insert);
-    }).catch((error) => { console.log(error) });
+        con.on('error', function(err) {
+            console.log('Error - duplicate price entry into coin prices');
+        });
+    }).catch((error) => console.log(error));
 }
 
 get_latest_prices = async function () {
     console.log('Getting latest record in crypto_prices');
-    con.query('USE crypto_app;');
+    con.query('USE crypto_schema;');
     return new Promise(function (resolve, reject) {
         let sql_query = "SELECT * FROM coin_prices ORDER BY id DESC LIMIT 120;";
         con.query(sql_query, function (err, rows, fields) {
             if (err) return reject(err);
             resolve(rows);
         });
+        con.on('error', function(err) {
+            reject('Database connection error');
+        });
     });
 }
 
 get_portfolio_by_id = async function (portfolio_id) {
     console.log('Getting latest portfolio record');
-    con.query('USE crypto_app;');
+    con.query('USE crypto_schema;');
     return new Promise(function (resolve, reject) {
         let sql_query = `SELECT * FROM portfolios WHERE portfolio_id = ${portfolio_id};`;
         con.query(sql_query, function (err, rows, fields) {
@@ -77,7 +82,7 @@ get_portfolio_value = async function (portfolio_id) {
 
 make_transaction = async function (portfolio_id, t_o) {
     console.log('Starting a new transaction');
-    con.query('USE crypto_app;');
+    con.query('USE crypto_schema;');
     return new Promise(function (resolve, reject) {
         get_latest_prices().then((latest_prices) => {
             get_portfolio_by_id(portfolio_id).then((current_portfolio) => {
@@ -118,17 +123,18 @@ make_transaction = async function (portfolio_id, t_o) {
                         resolve(new_rows);
                     })
                 });
+                con.on('error', function(err) {
+                    reject('Database Connection error');
+                });
             });
         }).catch((err) => console.log(err));
     }).catch((err) => console.log(err));
 }
 
 login = async function (username, password) {
-    con.query('USE crypto_app;');
+    con.query('USE crypto_schema;');
     let username_query = `SELECT * FROM users WHERE username = '${username}';`;
-    console.log(username_query);
     return new Promise(function (resolve, reject) {
-        console.log('in promise');
         con.query(username_query, function (err, rows) {
             if (err || rows == undefined) {
                 return reject(err);
@@ -142,8 +148,7 @@ login = async function (username, password) {
                     if (!res) {
                         return reject('Incorrect Password');
                     } else {
-                        console.log('login sucess');
-                        con.query('USE crypto_app;');
+                        con.query('USE crypto_schema;');
                         let portfolio_query = `SELECT * from portfolios WHERE portfolio_id=${rows[0]['id']}`;
                         con.query(portfolio_query, function (err, rows, fields) {
                             if (err) {
@@ -174,7 +179,7 @@ create_user = async function (username, password) {
                         console.log(password);
                         console.log(hash);
                         let create_user_sql = `INSERT INTO users (username, password, salt) VALUES ('${username}', '${hash}', '${saltRounds}')`;
-                        con.query('USE crypto_app;');
+                        con.query('USE crypto_schema;');
                     
                         con.query(create_user_sql, function (err, result) {
                             if (err) {

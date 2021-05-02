@@ -1,9 +1,10 @@
 const express = require('express');
 const app = express();
 const db = require('./db');
+const whale = require('./Whale-Alert');
 
 const cors = require('cors');
-app.use(cors({origin: "http://localhost:3000"}));
+app.use(cors({origin: "http://localhost:3001"}));
 
 const bodyParser = require('body-parser');
 app.use(bodyParser.json());
@@ -60,17 +61,15 @@ app.post('/transaction/:id/:ticker/:amt/:isbuy', (req, res) => {
     });
 });
 
+app.get('/transactions/whales/btc', (req, res) => {
+    whale.get_top_ten('btc', 5000000).then((response) => {
+        res.send(res.json(response));
+    }).catch((error) => {
+        console.log('Error in /transactions/whales/btc');
+    });
+});
+
 
 const port = process.env.PORT || 3000;
 
 app.listen(port, () => {console.log('Example app running on Port 3000')});
-
-//db.minute_update().then((response) => console.log(response));
-
-
-//db.get_latest_prices().then((response) => console.log(response));
-//db.get_portfolio_by_id(1).then((response)=> console.log(response));
-//let transaction_object = {ticker: 'ETH', amt: 1.2, is_buy: true};
-//let transaction_object_2 = {ticker: 'ETH', amt:1.2, is_buy:false};
-//db.make_transaction(1, transaction_object).then((response) => console.log(response))catch((error) => console.log(error));
-//db.make_transaction(1, transaction_object_2).then((response) => console.log(response)).catch((error) => console.log(error));

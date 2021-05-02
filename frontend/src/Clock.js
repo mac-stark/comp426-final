@@ -11,7 +11,7 @@ class Clock extends Component {
     })
     if(this.state.currentCount < 1) { 
         this.state.callback();
-        this.setState({currentCount:15});
+        this.setState({currentCount:this.props.seconds});
     }
   }
   componentDidMount() {
@@ -22,7 +22,7 @@ class Clock extends Component {
   }
   render() {
     return(
-      <div>{this.state.currentCount}</div>
+      <div></div>
     );
   }
 }

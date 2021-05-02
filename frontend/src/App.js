@@ -18,12 +18,14 @@ class App extends React.Component {
       username: this.props.username,
     };
     this.transaction_update = this.transaction_update.bind(this);
+    this.time_update = this.time_update.bind(this);
   }
   update = () => {
-    axios.get("http://localhost:3000/currentprices/").then((response) => {
-      console.log('Updating to latest price data');
-      this.setState({ current_prices: response.data, portfolio_id: this.state.portfolio_id, flip:!this.state.flip });
-    });
+    // axios.get("http://localhost:3000/currentprices/").then((response) => {
+    //   console.log('Updating to latest price data');
+    //   this.setState({ current_prices: response.data, portfolio_id: this.state.portfolio_id, flip:!this.state.flip });
+    // });
+    return;
   }
   round = (number) => {
     return Math.round(number*100) / 100;
@@ -31,6 +33,10 @@ class App extends React.Component {
   logout = () => {
     console.log('Logging Out');
     window.location.reload(false);
+  }
+  time_update(current_prices) {
+    console.log('Updating to latest price data');
+    this.setState({current_prices: current_prices, flip: !this.state.flip});
   }
   componentDidMount() {
     this.setState({ current_prices: this.props.current_prices, portfolio_id: this.props.portfolio_id, portfolio_values: this.props.portfolio, flip: false });
@@ -50,7 +56,6 @@ class App extends React.Component {
         <div className='top'>
           <h2>Mac's OG Crypto App!</h2>
           <h5>Logged in as: {this.state.username} <button type="button" onClick={this.logout}>Logout</button></h5>
-          <Clock callback={this.update}/>
           <Tabs>
             <div label="Bitcoin">
               <LineChart name={"Bitcoin"} data={this.state.current_prices.map((val) => val.btc_usd).reverse()} labels={labels} />
@@ -64,7 +69,7 @@ class App extends React.Component {
           </Tabs>
         </div>
         <div className='bottom'>
-          <Portfolio id={this.state.portfolio_id} values={this.state.portfolio_values} transaction_update={this.transaction_update} current_prices={this.state.current_prices[0]}/>
+          <Portfolio id={this.state.portfolio_id} values={this.state.portfolio_values} transaction_update={this.transaction_update} current_prices={this.state.current_prices[0]} time_update={this.time_update}/>
         </div>
       </div>);
     } else {
@@ -72,7 +77,6 @@ class App extends React.Component {
         <div className='top'>
           <h2>Mac's OG Crypto App!</h2>
           <h5>Logged in as: {this.state.username} <button type="button" onClick={this.logout}>Logout</button> </h5>
-          <Clock seconds={15} callback={this.update}/>
           <Tabs>
             <div label="Bitcoin">
               <LineChart name={"Bitcoin"} data={btc_data} labels={labels} />
@@ -86,7 +90,7 @@ class App extends React.Component {
           </Tabs>
         </div>
         <div className='bottom'>
-          <Portfolio id={this.state.portfolio_id} values={this.state.portfolio_values} transaction_update={this.transaction_update} current_prices={this.state.current_prices[0]} />
+          <Portfolio id={this.state.portfolio_id} values={this.state.portfolio_values} transaction_update={this.transaction_update} current_prices={this.state.current_prices[0]} time_update={this.time_update} />
         </div>
       </div>);
     }

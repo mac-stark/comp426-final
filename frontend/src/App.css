@@ -15,19 +15,24 @@
 .portfolio {
   position:absolute;
   display: inline-block;
-  left:0;
+  left:0%;
   height:50%;
-  width:50%;
+  width:30%;
   top:-75px;
 }
-
-.transaction {
-  position:relative;
-  left:50%;
+.whaleview{
+  position:absolute;
+  left:40%;
   height:50%;
-  width:50%;
-  bottom: 25%;
-  top:-75px;
+  width:15%;
+  bottom:25%;
+}
+.transaction {
+  position:absolute;
+  left:60%;
+  height:50%;
+  width:30%;
+  top: -100px;
 }
 .App {
   text-align: center;
