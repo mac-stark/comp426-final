@@ -11,7 +11,7 @@ class Login extends React.Component {
         let username = document.getElementById('username').value;
         let password = document.getElementById('password').value;
 
-        let go_url =`http://localhost:3000/login/${username}/${password}`;
+        let go_url =`http://localhost:5000/login/${username}/${password}`;
         axios({
             method:'get',
             url: go_url,
@@ -25,11 +25,14 @@ class Login extends React.Component {
     render() {
         
         return (<div><div className='login-container'>
-            <div>Login Form</div>
+            <div className='login-form-header'>Login Form</div>
+            <div className='login-username'>
             <label htmlFor='username'>Username</label>
             <input type='text' id='username' name='username'></input>
-            <label htmlFor='password'>Password</label>
-            <input type='password' id='password' name='password'></input>
+            </div>
+            <div className='login-password'><label htmlFor='password'>Password</label>
+            <input type='password' id='password' name='password'></input></div>
+
             <button type="button" onClick={this.onClick}>Login</button>
         </div><div>{this.state.error}</div></div>);
     }

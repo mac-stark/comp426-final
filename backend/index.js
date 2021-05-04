@@ -4,7 +4,7 @@ const db = require('./db');
 const whale = require('./Whale-Alert');
 
 const cors = require('cors');
-app.use(cors({origin: "http://localhost:3001"}));
+app.use(cors({origin: "http://localhost:3000"}));
 
 const bodyParser = require('body-parser');
 app.use(bodyParser.json());
@@ -26,9 +26,8 @@ app.get('/portfolio_value/:id', (req, res) => {
 });
 app.get('/login/:user/:pass' , (req, res) => {
     db.login(req.params.user, req.params.pass).then((response) => {
-        console.log('api');
         let resp_obj = {response:response,username:req.params.user};
-        res.send(res.json(resp_obj));
+        res.send(resp_obj);
     }).catch((error) => {
         console.log(error);
         if (error == 'Incorrect Password') {
@@ -46,30 +45,41 @@ app.post('/createuser/:user/:pass', (req,res) => {
         console.log(response);
         res.send(res.json(response));
     }).catch((error) => {
-        res.status(500);
-        res.send(res.json('Error in making account'))
+        res.status(400);
+        res.send(error);
         console.log('/createuser/user/pass' + error)
     });
 })
 app.post('/transaction/:id/:ticker/:amt/:isbuy', (req, res) => {
     let t_o = {ticker: req.params.ticker, amt: req.params.amt, is_buy: req.params.isbuy};
     console.log(t_o);
-    db.make_transaction(req.params.id, t_o).then((response) => { 
-        res.send(res.json(response));
+    db.make_transaction(req.params.id, t_o).then((response) => {
+        if (response == undefined) {
+            res.status(400);
+            res.send('Invalid Transaction-Insufficient Funds');
+            console.log('This error was sent');
+            return;
+        }
+        res.send(response);
     }).catch((error) => {
+            console.log('sending back error');
+            res.status(400);
+            res.send('Invalid Transaction');
             console.log('make_transaction' + error);
     });
 });
 
 app.get('/transactions/whales/btc', (req, res) => {
     whale.get_top_ten('btc', 5000000).then((response) => {
-        res.send(res.json(response));
+        res.send(response);
+        console.log('Latest Whale request sent');
     }).catch((error) => {
+        console.log(error);
         console.log('Error in /transactions/whales/btc');
     });
 });
 
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 5000;
 
-app.listen(port, () => {console.log('Example app running on Port 3000')});
+app.listen(port, () => {console.log('Example app running on Port ' + port)});

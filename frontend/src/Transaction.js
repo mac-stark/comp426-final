@@ -17,7 +17,7 @@ class Transaction extends React.Component {
             amt: document.getElementById("amount_1").value,
             is_buy: document.getElementById("type_1").value === 'buy' ? true:false,
         }
-        let go_url = `http://localhost:3000/transaction/${this.state.portfolio_id}/${t_o.ticker}/${t_o.amt}/${t_o.is_buy}`;
+        let go_url = `http://localhost:5000/transaction/${this.state.portfolio_id}/${t_o.ticker}/${t_o.amt}/${t_o.is_buy}`;
         await axios({
             method:'post',
             url: go_url,
@@ -27,33 +27,36 @@ class Transaction extends React.Component {
             console.log('calling portfolio callback');
         }).catch((error) => {
             console.log(error);
+            alert('Transaction Error: Insufficient Funds');
             console.log('Transaction Error: Illegal Transaction');
         });
         return;
     }
 
     render() {
-        return (<div className='transaction'>
-            <h1>Make a new transaction!</h1>
+        return (<div><div className='transaction-header'>Make a new transaction</div>
+        <div className='transaction'>
             <form id="form_1">
-                <label htmlFor='transaction_type'>Buy or Sell</label><br></br>
+            <div className='transaction-type'><label htmlFor='transaction_type'>Buy or Sell</label>
                 <select name='transaction_type' id='type_1'>
                     <option value="buy">Buy</option>
                     <option value="sell">Sell</option>
-                </select><br></br>
-                <label htmlFor='coin_type'>Select Coin</label><br></br>
+                </select></div>
+            <div className='transaction-coin'>
+            <label htmlFor='coin_type'>Select Coin            </label>
                 <select name='coin_type' id='coin_type_1'>
                     <option value="btc">Bitcoin</option>
                     <option value="eth">Ethereum</option>
                     <option value="ltc">Litecoin</option>
                 </select>
-                <br></br>
-                <label htmlFor='amount'>Enter the Transaction Amount</label>
+            </div> 
+            <div className='transaction-amount'>
+            <label htmlFor='amount'>Enter the Transaction Amount               </label>
                 <input type='number' id='amount_1'></input>
-                <br></br>
-                <input type = "submit" value ="Submit Transaction" onClick={this.onClick.bind(this)}></input>
+            </div>
+            <div className='transaction-submit-button'> <input type = "submit" value ="Submit Transaction" onClick={this.onClick.bind(this)}></input></div>   
             </form>
-        </div>);
+        </div></div>);
     }
 }
 export default Transaction;

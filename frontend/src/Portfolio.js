@@ -17,7 +17,7 @@ class Portfolio extends React.Component {
         return Math.round(number*100) / 100;
     }
     time_update = () => {
-        axios.get("http://localhost:3000/currentprices/").then((response) => {
+        axios.get("http://localhost:5000/currentprices/").then((response) => {
         console.log('Updating to latest price data');
         this.setState({ current_prices: response.data[0], portfolio_id: this.state.portfolio_id });
         this.state.callback_time_update(response.data);
@@ -37,18 +37,40 @@ class Portfolio extends React.Component {
         let usd = parseFloat(this.state.values.usd_amt);
         let current_value = btc * parseFloat(this.state.current_prices['btc_usd']) + eth * parseFloat(this.state.current_prices['eth_usd']) + ltc * parseFloat(this.state.current_prices['ltc_usd']) + usd;
         return (
-            <div>
+            <div className='bottom-grid'>
+                <div className='whale-view'>
                 <WhaleView/>
-                <Clock seconds={15} callback={this.time_update}/>
+                </div>
+                <div className='clock'><Clock on={true} seconds={15} callback={this.time_update}/></div>
                 <div className='portfolio'>
-                <h3>Current Value: <br></br> {this.round(current_value)} $ USD</h3>
-                <h4>Balances</h4>
-                <ul>
-                    <li>BTC : {btc}</li>
-                    <li>ETH : {eth}</li>
-                    <li>LTC : {ltc}</li>
-                    <li>USD : {usd}</li>
-                </ul>
+                <br></br>
+                <div className='portfolio-header'>Current Value:  {this.round(current_value)} $USD</div>
+                <div className='portfolio-card'>
+                <div className='portfolio-list'>
+                    <div className='table'>
+                        <div className='table-row'>
+                            <div className='table-data'>Currency</div>
+                            <div className='table-data'>Current Balance</div>
+                        </div>
+                        <div className='table-row'>
+                            <div className='table-data'>BTC</div>
+                            <div className='table-data'>{this.round(btc)}</div>
+                        </div>
+                        <div className='table-row'>
+                            <div className='table-data'>ETH</div>
+                            <div className='table-data'>{this.round(eth)}</div>
+                        </div>
+                        <div className='table-row'>
+                            <div className='table-data'>LTC</div>
+                            <div className='table-data'>{this.round(ltc)}</div>
+                        </div>
+                        <div className='table-row'>
+                            <div className='table-data'>USD</div>
+                            <div className='table-data'>{this.round(usd)}</div>
+                        </div>
+                    </div>
+                </div>
+                </div>
                 </div>
                 <div>
                     <Transaction portfolio_id={this.state.id} portfolio_values={this.state.values} update={this.update}/>

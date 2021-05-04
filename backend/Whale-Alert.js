@@ -20,8 +20,10 @@ get_whale_transactions = async function(currency, min_value) {
         axios({
             method:'get',
             url:go_url,
-    
-        }).then((response) => resolve(response)).catch((err) => reject(err));
+        }).then((response) => resolve(response)).catch((err) => {
+            console.log(err);
+            return reject(err);
+        });
     })
 
 }
@@ -40,12 +42,6 @@ get_top_ten = async function(currency, min_value) {
                 let prices_sorted = sorted.map((element) => element.amount_usd);
                 let top_ten = sorted.slice(0,10);
                 return resolve(top_ten);
-            } else {
-                if (length > 100) {
-                    return reject('1')
-                } else {
-                    return reject('0');
-                }
             }
         });
     })

@@ -12,28 +12,41 @@ let con = my_sql.createConnection({
 con.connect(function (err) {
     if (err) { throw err };
     console.log('Connected to mysql database');
-    setInterval(minute_update, 15 * 1000);
+    
+    setInterval(() => {
+        minute_update().then((response) => {
+
+        }).catch((err) =>console.log(err));
+    }, 15 * 1000);
 });
 
 minute_update = async function () {
-    con.query('USE crypto_schema;');
-    crypto_compare.get_crypto_prices().then((result) => {
-        let date_obj = result.date.split(' ');
-        let month = date_obj[2] == 'Apr' ? '04' : '05';
-        let finale_date = date_obj[3] + ':' + month + ':' + date_obj[1];
-        let seconds = Math.floor(parseFloat(date_obj[4].split(':')[2]) / 15) * 15;
-        let time = date_obj[4].split(':')[0] + ':' + date_obj[4].split(':')[1] + ':' + seconds;
-        let final_date_time = finale_date + ' ' + time;
-        let values = '(' + "'" + final_date_time + "'" + ',' + "'" + finale_date + "'" + ',' + "'" + time + "'" + ',' + result.price_data.BTC_USD + ',' + result.price_data.ETH_USD + ',' + result.price_data.LTC_USD + ')';
-        let insert = "INSERT INTO coin_prices (date_time, date, time, btc_usd, eth_usd, ltc_usd) VALUES " + values;
+    return new Promise(function(resolve, reject) {
+        con.query('USE crypto_schema;');
+        crypto_compare.get_crypto_prices().then((result) => {
+            let date_obj = result.date.split(' ');
+            let month = date_obj[2] == 'Apr' ? '04' : '05';
+            let finale_date = date_obj[3] + ':' + month + ':' + date_obj[1];
+            let seconds = Math.floor(parseFloat(date_obj[4].split(':')[2]) / 15) * 15;
+            let time = date_obj[4].split(':')[0] + ':' + date_obj[4].split(':')[1] + ':' + seconds;
+            let final_date_time = finale_date + ' ' + time;
+            let values = '(' + "'" + final_date_time + "'" + ',' + "'" + finale_date + "'" + ',' + "'" + time + "'" + ',' + result.price_data.BTC_USD + ',' + result.price_data.ETH_USD + ',' + result.price_data.LTC_USD + ')';
+            let insert = "INSERT INTO coin_prices (date_time, date, time, btc_usd, eth_usd, ltc_usd) VALUES " + values;
+            
         con.query(insert, function (err, result) {
-            if (err) throw err;
-            console.log("Latest price record inserted");
+            if (err) {
+                console.log('duplicate');
+                return reject(err);
+            } else {
+                console.log('Latest Price Record Inserted');
+                return resolve (result);
+            }
         });
         con.on('error', function(err) {
             console.log('Error - duplicate price entry into coin prices');
         });
-    }).catch((error) => console.log(error));
+    }).catch((error) => {console.log('duplicate2');return reject(error)});
+    });
 }
 
 get_latest_prices = async function () {
@@ -43,11 +56,11 @@ get_latest_prices = async function () {
         let sql_query = "SELECT * FROM coin_prices ORDER BY id DESC LIMIT 120;";
         con.query(sql_query, function (err, rows, fields) {
             if (err) return reject(err);
-            resolve(rows);
+            return resolve(rows);
         });
-        con.on('error', function(err) {
-            reject('Database connection error');
-        });
+        // con.on('error', function(err) {
+        //     reject('Database connection error');
+        // });
     });
 }
 
@@ -95,7 +108,7 @@ make_transaction = async function (portfolio_id, t_o) {
                     let cost = parseFloat(t_o.amt) * parseFloat(latest_prices[price_tick]);
                     if (parseFloat(current_portfolio.usd_amt) - parseFloat(cost) < 0) {
                         console.log('Throwing error')
-                        throw new Error('Invalid transaction');
+                        return reject(new Error('Invalid transaction'));
                     } else {
                         let new_ticker_amt = parseFloat(current_portfolio[port_tick]) + parseFloat(t_o.amt);
                         let new_usd_amt = parseFloat(current_portfolio['usd_amt']) - parseFloat(cost);
@@ -107,7 +120,7 @@ make_transaction = async function (portfolio_id, t_o) {
                     let sale_amt = parseFloat(t_o.amt) * parseFloat(latest_prices[price_tick]);
                     if (parseFloat(current_portfolio[port_tick]) - parseFloat(t_o.amt) < 0) {
                         console.log('Throwing error');
-                        throw new Error('Invalid transaction');
+                        return reject(new Error('Invalid transaction'));
                     } else {
                         let new_ticker_amt = parseFloat(current_portfolio[port_tick]) - parseFloat(t_o.amt);
                         let new_usd_amt = parseFloat(current_portfolio['usd_amt']) + parseFloat(sale_amt);
@@ -119,8 +132,10 @@ make_transaction = async function (portfolio_id, t_o) {
                 con.query(sql_query, function (err, rows, fields) {
                     if (err) return reject(err);
                     con.query(`SELECT * FROM portfolios WHERE portfolio_id=${portfolio_id}`, function (err, new_rows, new_fields) {
-                        if (err) return reject(err);
-                        resolve(new_rows);
+                        if (err) {
+                            return reject(err);
+                        }
+                        return resolve(new_rows);
                     })
                 });
                 con.on('error', function(err) {
@@ -191,10 +206,6 @@ create_user = async function (username, password) {
                                     if (err) {
                                         return reject(err);
                                     } else {
-                                        console.log(result);
-                                        console.log(result.insertId);
-                                        console.log(parseFloat(result.insertId));
-                                        console.log(parseInt(result.insertId));
                                         let portfolio_sql = `INSERT INTO portfolios (portfolio_id, usd_amt, btc_amt, eth_amt, ltc_amt) VALUES (${result.insertId}, 100000, 0, 0, 0);`;
                                         console.log(portfolio_sql);
                                         con.query(portfolio_sql, function(err, result) {
@@ -216,6 +227,7 @@ create_user = async function (username, password) {
     });
 }
 const first_pass = 'password123';
+
 
 
 module.exports.make_transaction = make_transaction;

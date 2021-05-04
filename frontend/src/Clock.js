@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 class Clock extends Component {
   constructor(props){
     super(props);
-    this.state = {currentCount: this.props.seconds, callback:this.props.callback}
+    this.state = {currentCount: this.props.seconds, callback:this.props.callback, on:this.props.on}
   }
   timer() {
     this.setState({
@@ -22,7 +22,7 @@ class Clock extends Component {
   }
   render() {
     return(
-      <div></div>
+      <div>{this.state.on ? this.state.currentCount: ''}</div>
     );
   }
 }

@@ -5,6 +5,7 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: rgb(218, 218, 255);
 }
 
 code {
@@ -13,13 +14,31 @@ code {
 }
 .login-container {
   position: absolute;
-  top: 50%;
-  left: 30%;
-  margin-top: -50px;
-  margin-left: -50px;
-  width: 150px;
-  height: 150px;
-  
+  left: calc(43%);
+  top: calc(45%);
+  width: 15%;
+  height: 33%;
+  border:5px solid black;
+  text-align: center;
+  background-color:rgb(199, 197, 197)
+}
+
+.login-form-header {
+  position:relative;
+  font-size:20px;
+  border:2px solid black;
+  border-style:ridge;
+  padding-bottom:10px;
+  margin-bottom:10px;
+  padding-top:0px;
+  margin-top:0px;
+  text-align: center;
+}
+.new-user-button {
+  font-size:20px;
+  position:absolute;
+  left:46%;
+  top:75%;
 }
 .new-user-container {
   position: absolute;
@@ -32,8 +51,19 @@ code {
 }
 .login-header{
   position:absolute;
-  top:10%;
+  text-align: center;
+  top:5%;
   left:35%;
   width:500px;
   height:150px;
+}
+
+.logged-in-as{
+  position:relative;
+  text-align: center;
+  width: 10%;
+  height:15%;
+  left:90%;
+  top: 70%;
+  font-size:12px;
 }
