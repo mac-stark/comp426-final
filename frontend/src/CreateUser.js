@@ -1,6 +1,8 @@
 import React from 'react';
 import axios from 'axios';
 
+let base_url = true ? "https://crypto-web-app-macstark.herokuapp.com/" : "http://localhost:3000/";
+
 class CreateUser extends React.Component {
     constructor(props) {
         super(props);
@@ -11,10 +13,10 @@ class CreateUser extends React.Component {
         let username = document.getElementById('new_username').value;
         let password = document.getElementById('new_password').value;
 
-        let go_url = `http://localhost:5000/createuser/${username}/${password}`;
+        let go_url = base_url + `createuser/${username}/${password}`;
         console.log(go_url);
         axios({
-            method: 'post',
+            method: 'get',
             url: go_url,
         }).then((response) => {
             console.log(response);

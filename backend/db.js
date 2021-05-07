@@ -1,13 +1,17 @@
 const my_sql = require('mysql');
 const crypto_compare = require('./crypto-compare');
 const bcrypt = require('bcryptjs');
+const { get_top_ten } = require('./Whale-Alert');
 const saltRounds = 10;
-let con = my_sql.createConnection({
-    host: "localhost",
-    user: "root",
-    password: 'Bengals12@#$',
-    insecureAuth: true
-});
+const whale = require('./Whale-Alert');
+
+const is_deploy = true;
+
+const connect = is_deploy ? {host: "us-cdbr-east-03.cleardb.com", port: 3306, user: "bd043dd882d422", password: '11767509', database: 'heroku_b91f95b8d32efda',}: 
+{host: "localhost", user: "root", password: 'Bengals12@#$', insecureAuth: true};
+
+console.log(connect);
+let con = my_sql.createConnection(connect);
 
 con.connect(function (err) {
     if (err) { throw err };
@@ -18,19 +22,48 @@ con.connect(function (err) {
 
         }).catch((err) =>console.log(err));
     }, 15 * 1000);
-});
+
+    setInterval(() => {
+        whale_update().then((response) => {
+            console.log('Latest Whale records inserted');
+        }).catch((error) => console.log(error));
+    }, 5 * 60 * 1000);
+}); 
+
+
+whale_update = async function() {
+    return new Promise(function(resolve, reject) {
+        con.query('USE heroku_b91f95b8d32efda;');
+        //con.query('USE crypto_schema;');
+        get_top_ten('btc',5000000).then((response) => {
+            let values = response.map((element) => `('${element.date_time}', ${element.btc_amt}, ${element.usd_amt}, '${element.date}', '${element.time}')`);
+            let total_query = values.join(',')
+            let insert_sql = `INSERT IGNORE INTO whales (date_time, btc_amt, usd_amt, date, time) VALUES ${total_query};`;
+            console.log(insert_sql);
+            con.query(insert_sql, function(err, rows, fields) {
+                if (err) {
+                    console.log('duplicate');
+                    return reject(err);
+                } else {
+                    console.log('Latest Whale records inserted');
+                }
+            })
+            con.on('error', function(err) {
+                console.log('Error - duplicate entry in whales');
+            });
+        }).catch((error) => {console.log('duplicate2');return reject(error)});
+    }) 
+}
 
 minute_update = async function () {
     return new Promise(function(resolve, reject) {
-        con.query('USE crypto_schema;');
+        con.query('USE heroku_b91f95b8d32efda;');
+        //con.query('USE crypto_schema;');
         crypto_compare.get_crypto_prices().then((result) => {
-            let date_obj = result.date.split(' ');
-            let month = date_obj[2] == 'Apr' ? '04' : '05';
-            let finale_date = date_obj[3] + ':' + month + ':' + date_obj[1];
-            let seconds = Math.floor(parseFloat(date_obj[4].split(':')[2]) / 15) * 15;
-            let time = date_obj[4].split(':')[0] + ':' + date_obj[4].split(':')[1] + ':' + seconds;
-            let final_date_time = finale_date + ' ' + time;
-            let values = '(' + "'" + final_date_time + "'" + ',' + "'" + finale_date + "'" + ',' + "'" + time + "'" + ',' + result.price_data.BTC_USD + ',' + result.price_data.ETH_USD + ',' + result.price_data.LTC_USD + ')';
+            let date = result.date.split(' ')[0];
+            let time = result.date.split(' ')[1];
+            let final_date_time = result.date;
+            let values = '(' + "'" + final_date_time + "'" + ',' + "'" + date + "'" + ',' + "'" + time + "'" + ',' + result.price_data.BTC_USD + ',' + result.price_data.ETH_USD + ',' + result.price_data.LTC_USD + ')';
             let insert = "INSERT INTO coin_prices (date_time, date, time, btc_usd, eth_usd, ltc_usd) VALUES " + values;
             
         con.query(insert, function (err, result) {
@@ -51,9 +84,10 @@ minute_update = async function () {
 
 get_latest_prices = async function () {
     console.log('Getting latest record in crypto_prices');
-    con.query('USE crypto_schema;');
+    con.query('USE heroku_b91f95b8d32efda;');
+    //con.query('USE crypto_schema;');
     return new Promise(function (resolve, reject) {
-        let sql_query = "SELECT * FROM coin_prices ORDER BY id DESC LIMIT 120;";
+        let sql_query = "SELECT * FROM coin_prices ORDER BY id DESC LIMIT 480;";
         con.query(sql_query, function (err, rows, fields) {
             if (err) return reject(err);
             return resolve(rows);
@@ -66,7 +100,8 @@ get_latest_prices = async function () {
 
 get_portfolio_by_id = async function (portfolio_id) {
     console.log('Getting latest portfolio record');
-    con.query('USE crypto_schema;');
+    con.query('USE heroku_b91f95b8d32efda;');
+    //con.query('USE crypto_schema;');
     return new Promise(function (resolve, reject) {
         let sql_query = `SELECT * FROM portfolios WHERE portfolio_id = ${portfolio_id};`;
         con.query(sql_query, function (err, rows, fields) {
@@ -78,6 +113,8 @@ get_portfolio_by_id = async function (portfolio_id) {
 
 get_portfolio_value = async function (portfolio_id) {
     console.log(`Getting latest portfolio value for portfolio ${portfolio_id}`);
+    con.query('USE heroku_b91f95b8d32efda;');
+    //con.query('USE crypto_schema;');
     get_latest_prices().then((latest_prices) => {
         get_portfolio_by_id(portfolio_id).then((current_portfolio) => {
             latest_prices = latest_prices[0];
@@ -95,7 +132,8 @@ get_portfolio_value = async function (portfolio_id) {
 
 make_transaction = async function (portfolio_id, t_o) {
     console.log('Starting a new transaction');
-    con.query('USE crypto_schema;');
+    con.query('USE heroku_b91f95b8d32efda;');
+    //con.query('USE crypto_schema;');
     return new Promise(function (resolve, reject) {
         get_latest_prices().then((latest_prices) => {
             get_portfolio_by_id(portfolio_id).then((current_portfolio) => {
@@ -147,23 +185,29 @@ make_transaction = async function (portfolio_id, t_o) {
 }
 
 login = async function (username, password) {
-    con.query('USE crypto_schema;');
+    con.query('USE heroku_b91f95b8d32efda;');
+    //con.query('USE crypto_schema;');
+    console.log('LOGIN');
     let username_query = `SELECT * FROM users WHERE username = '${username}';`;
+    console.log(username_query);
     return new Promise(function (resolve, reject) {
+        console.log('inside promise');
         con.query(username_query, function (err, rows) {
+            console.log(rows);
             if (err || rows == undefined) {
                 return reject(err);
             } else {
                 if (rows[0] == undefined) {
+                    console.log('rows[0] undefined');
                     return reject(err);
                 }
+                console.log(rows);
                 console.log(rows[0].password);
                 bcrypt.compare(password, rows[0].password, function (err, res) {
                     console.log(res);
                     if (!res) {
                         return reject('Incorrect Password');
                     } else {
-                        con.query('USE crypto_schema;');
                         let portfolio_query = `SELECT * from portfolios WHERE portfolio_id=${rows[0]['id']}`;
                         con.query(portfolio_query, function (err, rows, fields) {
                             if (err) {
@@ -193,8 +237,10 @@ create_user = async function (username, password) {
                     } else {
                         console.log(password);
                         console.log(hash);
-                        let create_user_sql = `INSERT INTO users (username, password, salt) VALUES ('${username}', '${hash}', '${saltRounds}')`;
-                        con.query('USE crypto_schema;');
+                        let create_user_sql = `INSERT INTO users (username, password, salt) VALUES ('${username}', '${hash}', '${10}')`;
+                        console.log(create_user_sql);
+                        con.query('USE heroku_b91f95b8d32efda;');
+                        //con.query('USE crypto_schema;');
                     
                         con.query(create_user_sql, function (err, result) {
                             if (err) {
@@ -226,8 +272,27 @@ create_user = async function (username, password) {
         })
     });
 }
-const first_pass = 'password123';
 
+
+get_whale_list = async function() {
+    console.log("Getting top Whales of the last hour");
+    con.query('USE heroku_b91f95b8d32efda;');
+    //con.query('USE crypto_schema;');
+    return new Promise(function(resolve, reject) {
+        let whale_sql = 'SELECT * FROM whales WHERE hour(whales.time) = hour(now())-1 OR hour(whales.time)=hour(now()) ORDER BY btc_amt DESC LIMIT 5;';
+        con.query(whale_sql, function(err, rows, fields) {
+            if (err) {
+                return reject(err);
+            } else {
+                if (rows == undefined) {
+                    return reject('Whale error');
+                } else {
+                    return resolve(rows);
+                }
+            }
+        })
+    });
+}
 
 
 module.exports.make_transaction = make_transaction;
@@ -237,3 +302,7 @@ module.exports.get_portfolio_value = get_portfolio_value;
 module.exports.minute_update = minute_update;
 module.exports.create_user = create_user;
 module.exports.login = login;
+module.exports.whale_update = whale_update;
+module.exports.get_whale_list = get_whale_list;
+
+

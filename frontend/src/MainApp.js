@@ -4,6 +4,8 @@ import App from './App';
 import axios from 'axios';
 import CreateUser from './CreateUser';
 
+let base_url = true ? "https://crypto-web-app-macstark.herokuapp.com/" : "http://localhost:3000/";
+
 class MainApp extends React.Component {
     constructor(props){
         super(props);
@@ -14,7 +16,7 @@ class MainApp extends React.Component {
     login = async (id, values, user) => {
         axios({
             method:'get',
-            url: 'http://localhost:5000/currentprices/',
+            url: base_url + 'currentprices/',
         }).then((response) =>{
             this.setState({isLoggedIn:true, portfolio_id:id, portfolio_values:values, current_prices:response.data, username:user,loggin_in:true});
         })

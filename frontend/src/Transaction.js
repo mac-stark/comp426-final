@@ -1,6 +1,8 @@
 import axios from 'axios';
 import React from 'react';
 
+let base_url = true ? "https://crypto-web-app-macstark.herokuapp.com/" : "http://localhost:3000/";
+
 class Transaction extends React.Component {
     constructor(props){
         super(props);
@@ -9,7 +11,7 @@ class Transaction extends React.Component {
     componentDidMount() {
         this.setState({portfolio_id: this.props.portfolio_id, portfolio_values: this.props.portfolio_values, t_o:{}, callback:this.props.update});
     }
-
+    
     async onClick(event) {
         event.preventDefault();
         let t_o = {
@@ -17,7 +19,7 @@ class Transaction extends React.Component {
             amt: document.getElementById("amount_1").value,
             is_buy: document.getElementById("type_1").value === 'buy' ? true:false,
         }
-        let go_url = `http://localhost:5000/transaction/${this.state.portfolio_id}/${t_o.ticker}/${t_o.amt}/${t_o.is_buy}`;
+        let go_url = base_url+`transaction/${this.state.portfolio_id}/${t_o.ticker}/${t_o.amt}/${t_o.is_buy}`;
         await axios({
             method:'post',
             url: go_url,

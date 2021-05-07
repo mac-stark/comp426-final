@@ -11,9 +11,9 @@ Date.time = function() {return Date.now().getUnixTime();}
 
 get_whale_transactions = async function(currency, min_value) {
     let end = Math.floor(Date.now() / 1000) ;
-    let start = end - 3600;
+    let start = end - 3000;
     let limit = 100;
-    let go_url = base_url + '?api_key='+API_KEY+'&min_value='+min_value+'&start='+start+'&currency='+currency;
+    let go_url = base_url + '?api_key='+API_KEY+'&min_value='+min_value+'&start='+start+'&currency='+currency+'&limit='+limit;
 
 
     return new Promise(function(resolve, reject) {
@@ -36,16 +36,25 @@ get_top_ten = async function(currency, min_value) {
             }
             let data = response.data;
             let transaction_list = data.transactions;
-            let length = transaction_list.map((element) => 1).reduce((accumulator, sum) => sum+accumulator);
-            if (length <= 100 && length >= 10) { 
-                let sorted = transaction_list.sort((ele1, ele2) => ele2.amount_usd - ele1.amount_usd);
-                let prices_sorted = sorted.map((element) => element.amount_usd);
-                let top_ten = sorted.slice(0,10);
-                return resolve(top_ten);
-            }
-        });
-    })
+            let sorted = transaction_list.sort(function(ele1,ele2) {
+                return ele2.amount-ele1.amount;
+            });
+            let whale_objs = sorted.map((element) => {
+                let date_time = new Date(0);
+                date_time.setUTCSeconds(element.timestamp);
+                let str = `0${date_time.getMonth() + 1}:${date_time.toString().split(' ')[2]}:${date_time.getFullYear()} ` + `${date_time.toString().split(' ')[4]}`;
+                return {
+                    btc_amt: element.amount,
+                    usd_amt: element.amount_usd,
+                    date_time : str,
+                    date: `0${date_time.getMonth() + 1}:${date_time.toString().split(' ')[2]}:${date_time.getFullYear()}`,
+                    time:`${date_time.toString().split(' ')[4]}`,
+                };
+            });
 
+            return resolve(whale_objs.slice(0,5));
+        }).catch((error) => console.log(error));
+    });
 }
 
 module.exports.get_top_ten = get_top_ten;

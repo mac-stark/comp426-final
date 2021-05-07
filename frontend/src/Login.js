@@ -1,6 +1,8 @@
 import React from 'react';
 import axios from 'axios';
 
+let base_url = true ? "https://crypto-web-app-macstark.herokuapp.com/" : "http://localhost:3000/";
+
 class Login extends React.Component {
     constructor(props) {
         super(props);
@@ -11,7 +13,8 @@ class Login extends React.Component {
         let username = document.getElementById('username').value;
         let password = document.getElementById('password').value;
 
-        let go_url =`http://localhost:5000/login/${username}/${password}`;
+        let go_url = base_url + `login/${username}/${password}`;
+        console.log(go_url);
         axios({
             method:'get',
             url: go_url,

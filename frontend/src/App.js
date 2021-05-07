@@ -4,7 +4,6 @@ import Tabs from "./components/Tabs";
 import Portfolio from './Portfolio';
 import LineChart from './LineChart'
 
-
 class App extends React.Component {
   constructor(props) {
     super(props);
@@ -26,10 +25,10 @@ class App extends React.Component {
   }
   time_update(current_prices) {
     console.log('Updating to latest price data');
-    this.setState({current_prices: current_prices, flip: !this.state.flip});
+    this.setState({current_prices: current_prices, flip: !this.state.flip, });
   }
   componentDidMount() {
-    this.setState({ current_prices: this.props.current_prices, portfolio_id: this.props.portfolio_id, portfolio_values: this.props.portfolio, flip: false });
+    this.setState({ current_prices: this.props.current_prices, portfolio_id: this.props.portfolio_id, portfolio_values: this.props.portfolio, flip: false, });
   }
   transaction_update(new_portfolio_values) {
     this.setState({ portfolio_values: new_portfolio_values});

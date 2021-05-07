@@ -3,16 +3,17 @@ const app = express();
 const db = require('./db');
 const whale = require('./Whale-Alert');
 
+const is_deploy = true;
+const origin_cors = is_deploy? "https://mac-stark.github.io/*": "http://localhost:3001/";
 const cors = require('cors');
-app.use(cors({origin: "http://localhost:3000"}));
+app.use(cors()); 
 
 const bodyParser = require('body-parser');
 app.use(bodyParser.json());
 
 app.get('/', function(req, res) {
     console.log('Received a main page request');
-    //res.send('Hello World');
-    res.send('<!DOCTYPE html> <html> <head><title>LAN network experiment</title></head><body>You are gay. <img src="https://i.guim.co.uk/img/media/02088fb2247b13df646907d47f552dc69a236bc7/0_748_3235_1940/master/3235.jpg?width=1200&height=1200&quality=85&auto=format&fit=crop&s=172ccbaa7535c9e16d0455138d20a07c" alt="monke"></body></html>');
+    res.send('<!DOCTYPE html> <html> <head><title>LAN network experiment</title></head><body>Hey Dad. <img src="https://i.guim.co.uk/img/media/02088fb2247b13df646907d47f552dc69a236bc7/0_748_3235_1940/master/3235.jpg?width=1200&height=1200&quality=85&auto=format&fit=crop&s=172ccbaa7535c9e16d0455138d20a07c" alt="monke"></body></html>');
 });
 app.get('/currentprices', (req, res) => {
     console.log('Received a request for latest prices');
@@ -39,7 +40,7 @@ app.get('/login/:user/:pass' , (req, res) => {
         console.log('/login/user/pass' + error)
     });
 });
-app.post('/createuser/:user/:pass', (req,res) => {
+app.get('/createuser/:user/:pass', (req,res) => {
     console.log('New user creation');
     db.create_user(req.params.user, req.params.pass).then((response) => {
         console.log(response);
@@ -70,16 +71,17 @@ app.post('/transaction/:id/:ticker/:amt/:isbuy', (req, res) => {
 });
 
 app.get('/transactions/whales/btc', (req, res) => {
-    whale.get_top_ten('btc', 5000000).then((response) => {
+    console.log('Received a Whale request');
+    db.get_whale_list().then((response) => {
+        console.log(response);
         res.send(response);
-        console.log('Latest Whale request sent');
-    }).catch((error) => {
-        console.log(error);
-        console.log('Error in /transactions/whales/btc');
-    });
+    }).catch((error) => console.log(error));
 });
 
 
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 3000;
 
 app.listen(port, () => {console.log('Example app running on Port ' + port)});
+
+
+

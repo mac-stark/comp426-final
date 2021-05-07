@@ -4,6 +4,9 @@ import axios from 'axios';
 import Clock from './Clock';
 import WhaleView from './WhaleView';
 
+let base_url = true? "https://crypto-web-app-macstark.herokuapp.com/" : "http://localhost:3000/";
+
+
 class Portfolio extends React.Component {
     constructor(props){
         super(props);
@@ -17,12 +20,12 @@ class Portfolio extends React.Component {
         return Math.round(number*100) / 100;
     }
     time_update = () => {
-        axios.get("http://localhost:5000/currentprices/").then((response) => {
-        console.log('Updating to latest price data');
-        this.setState({ current_prices: response.data[0], portfolio_id: this.state.portfolio_id });
-        this.state.callback_time_update(response.data);
-        console.log(this.state);
-        console.log(this.state.current_prices);
+        axios.get(base_url + "currentprices/").then((response) => {
+            console.log('Updating to latest price data');
+            this.setState({ current_prices: response.data[0], portfolio_id: this.state.portfolio_id });
+            this.state.callback_time_update(response.data);
+
+            //console.log(this.state.current_prices);
     });
     }
     update(new_portfolio_values){
@@ -48,9 +51,9 @@ class Portfolio extends React.Component {
                 <div className='portfolio-card'>
                 <div className='portfolio-list'>
                     <div className='table'>
-                        <div className='table-row'>
-                            <div className='table-data'>Currency</div>
-                            <div className='table-data'>Current Balance</div>
+                        <div className='table-row' key='portfolio-table-header-thing'>
+                            <div className='table-data' key='portfolio-table-header-currency'>Currency</div>
+                            <div className='table-data' key='portfolio-table-header-balance'>Current Balance</div>
                         </div>
                         <div className='table-row'>
                             <div className='table-data'>BTC</div>
