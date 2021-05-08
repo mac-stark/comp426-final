@@ -13,7 +13,7 @@ app.use(bodyParser.json());
 
 app.get('/', function(req, res) {
     console.log('Received a main page request');
-    res.send('<!DOCTYPE html> <html> <head><title>LAN network experiment</title></head><body>Hey Dad. <img src="https://i.guim.co.uk/img/media/02088fb2247b13df646907d47f552dc69a236bc7/0_748_3235_1940/master/3235.jpg?width=1200&height=1200&quality=85&auto=format&fit=crop&s=172ccbaa7535c9e16d0455138d20a07c" alt="monke"></body></html>');
+    res.send('<!DOCTYPE html> <html> <head><title>LAN network experiment</title></head><body><div><h3Hey, this is just my backend.<h3></div><div><img src="https://i.guim.co.uk/img/media/02088fb2247b13df646907d47f552dc69a236bc7/0_748_3235_1940/master/3235.jpg?width=1200&height=1200&quality=85&auto=format&fit=crop&s=172ccbaa7535c9e16d0455138d20a07c" alt="monke"></div></body></html>');
 });
 app.get('/currentprices', (req, res) => {
     console.log('Received a request for latest prices');

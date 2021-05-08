@@ -1,3 +1,9 @@
+const connect = {host: "us-cdbr-east-03.cleardb.com", port: 3306, user: "bd043dd882d422", password: '11767509', database: 'heroku_b91f95b8d32efda',};
+
+
+
+
+
 const my_sql = require('mysql');
 const crypto_compare = require('./crypto-compare');
 const bcrypt = require('bcryptjs');
@@ -7,8 +13,8 @@ const whale = require('./Whale-Alert');
 
 const is_deploy = true;
 
-const connect = is_deploy ? {host: "us-cdbr-east-03.cleardb.com", port: 3306, user: "bd043dd882d422", password: '11767509', database: 'heroku_b91f95b8d32efda',}: 
-{host: "localhost", user: "root", password: 'Bengals12@#$', insecureAuth: true};
+
+
 
 console.log(connect);
 let con = my_sql.createConnection(connect);
